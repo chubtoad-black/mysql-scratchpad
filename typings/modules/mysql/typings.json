@@ -1,0 +1,10 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/types/npm-mysql/c3a7c0bf94ecf886d5ce7b5e4e5e7d17cf5b9668/typings.json",
+    "raw": "registry:npm/mysql#2.11.1+20161114232222",
+    "main": "index.d.ts",
+    "version": "2.11.1",
+    "name": "mysql"
+  }
+}
