@@ -25,7 +25,6 @@ export class MySQLUtil{
         return new Promise<ConnectionOptions>((resolve, reject) => {
             vscode.window.showInputBox({
                 prompt:'Username for '+options.host,
-                ignoreFocusOut:true
             }).then(userName => {
                 options.user = userName;
                 resolve(options);
@@ -37,8 +36,7 @@ export class MySQLUtil{
         return new Promise<ConnectionOptions>((resolve, reject) => {
             vscode.window.showInputBox({
                 prompt:'Password for '+options.user+'@'+options.host,
-                password:true,
-                ignoreFocusOut:true
+                password:true
             }).then(userPass => {
                 options.password = userPass;
                 resolve(options);

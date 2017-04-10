@@ -1,6 +1,7 @@
 import {window, workspace, commands, Range, TextEditor, Disposable, Uri, TextDocument, ViewColumn} from 'vscode';
 import {ConnectionController} from './ConnectionController';
 import {MySqlResultDocumentContentProvider} from '../views/MySqlResultDocumentContentProvider';
+import {MySqlStatementParser} from '../utils/MySqlStatementParser';
 
 export class RequestController{
     private _resultDocumentProvider:MySqlResultDocumentContentProvider;
@@ -16,29 +17,22 @@ export class RequestController{
         if(!editor || !editor.document){
             return;
         }
-
-        let statement = this.getStatement(editor);
+        let parser = new MySqlStatementParser(editor);
+        let statement = parser.parseStatementUnderCursor();
+        
         if(!statement){
             return;
         }
         console.log("selected statement: ",statement);
-        this._resultDocumentProvider.setStatement(statement);
-        this.execute(statement)
-            .then(result => {
-                this._resultDocumentProvider.setResult(result);
-                let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
-                this._resultDocumentProvider.refresh(uri);
-                commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'Result');
-            })
+        // this._resultDocumentProvider.setStatement(statement);
+        // this.execute(statement)
+        //     .then(result => {
+        //         this._resultDocumentProvider.setResult(result);
+        //         let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
+        //         this._resultDocumentProvider.refresh(uri);
+        //         commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'Result');
+        //     })
         
-    }
-
-    private getStatement(editor:TextEditor):string{
-        let line = editor.selection.active.line;
-        //TODO: some sort of sql parser? pull statement out
-            // go left from cursor until you hit start of file or ; = this is the start of the command
-            // go right from the cursor until you hit ; or end of file = this is the end of the command
-        return editor.document.lineAt(line).text;
     }
 
     private execute(sql:string, args?:any[]):Thenable<any>{
