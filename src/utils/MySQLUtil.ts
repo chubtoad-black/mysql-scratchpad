@@ -3,14 +3,14 @@ import {Connection, ConnectionOptions, createConnection} from 'mysql';
 
 export class MySQLUtil{
 
-    public static getMysqlConnectionOptions():Thenable<ConnectionOptions>{
+    public static getMysqlConnectionOptions():Promise<ConnectionOptions>{
         let options:ConnectionOptions = {};
         return this.getHostName(options)
             .then(options => this.getUserName(options))
             .then(options => this.getUserPass(options));
     }
 
-    private static getHostName(options:ConnectionOptions):Thenable<ConnectionOptions>{
+    private static getHostName(options:ConnectionOptions):Promise<ConnectionOptions>{
         return new Promise<ConnectionOptions>((resolve, reject) => {
             vscode.window.showInputBox({
                 prompt: "MySQL host:"
@@ -21,7 +21,7 @@ export class MySQLUtil{
         });
     }
 
-    private static getUserName(options:ConnectionOptions):Thenable<ConnectionOptions>{
+    private static getUserName(options:ConnectionOptions):Promise<ConnectionOptions>{
         return new Promise<ConnectionOptions>((resolve, reject) => {
             vscode.window.showInputBox({
                 prompt:'Username for '+options.host,
@@ -32,7 +32,7 @@ export class MySQLUtil{
         });
     }
 
-    private static getUserPass(options:ConnectionOptions):Thenable<ConnectionOptions>{
+    private static getUserPass(options:ConnectionOptions):Promise<ConnectionOptions>{
         return new Promise<ConnectionOptions>((resolve, reject) => {
             vscode.window.showInputBox({
                 prompt:'Password for '+options.user+'@'+options.host,
