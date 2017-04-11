@@ -24,14 +24,14 @@ export class RequestController{
             return;
         }
         console.log("selected statement: ",statement);
-        // this._resultDocumentProvider.setStatement(statement);
-        // this.execute(statement)
-        //     .then(result => {
-        //         this._resultDocumentProvider.setResult(result);
-        //         let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
-        //         this._resultDocumentProvider.refresh(uri);
-        //         commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'Result');
-        //     })
+        this._resultDocumentProvider.setStatement(statement);
+        this.execute(statement)
+            .then(result => {
+                this._resultDocumentProvider.setResult(result);
+                let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
+                this._resultDocumentProvider.refresh(uri);
+                commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'Result');
+            })
         
     }
 
