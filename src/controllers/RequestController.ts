@@ -30,7 +30,7 @@ export class RequestController{
                 this._resultDocumentProvider.setResult(result);
                 let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
                 this._resultDocumentProvider.refresh(uri);
-                commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'Result');
+                commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'MySQL Result');
             })
         
     }

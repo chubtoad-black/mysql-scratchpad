@@ -7,7 +7,8 @@ export class MySQLUtil{
         let options:ConnectionOptions = {};
         return this.getHostName(options)
             .then(options => this.getUserName(options))
-            .then(options => this.getUserPass(options));
+            .then(options => this.getUserPass(options))
+            .then(options => this.addDefaults(options));
     }
 
     private static getHostName(options:ConnectionOptions):Promise<ConnectionOptions>{
@@ -41,6 +42,13 @@ export class MySQLUtil{
                 options.password = userPass;
                 resolve(options);
             });
+        });
+    }
+
+    private static addDefaults(options:ConnectionOptions):Promise<ConnectionOptions>{
+        return new Promise<ConnectionOptions>((resolve, reject) => {
+           options.multipleStatements = true;
+           resolve(options);
         });
     }
 }

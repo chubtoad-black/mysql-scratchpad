@@ -10,8 +10,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(requestController);
     context.subscriptions.push(connectionController);
-    context.subscriptions.push(vscode.commands.registerCommand('extension.mysqlConnect', () => connectionController.inputConnectionAndConnect()));
-    context.subscriptions.push(vscode.commands.registerCommand('extensions.executeCurrentLine', ()=> requestController.executeStatementUnderCursor()));
+    context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.mysqlConnect', () => connectionController.inputConnectionAndConnect()));
+    context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.mysqlDisconnect', ()=> connectionController.closeConnection()));
+    context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.executeCurrentLine', ()=> requestController.executeStatementUnderCursor()));
+    context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.openScratchpad', () => connectionController.openScratchpad()));
 }
 
 

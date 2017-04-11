@@ -11,16 +11,26 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.mysqlConnect"
+        "onCommand:mysql-scratchpad.mysqlConnect"
     ],
     "main": "./out/src/extension",
     "contributes": {
         "commands": [{
-            "command": "extension.mysqlConnect",
-            "title": "Connect To MySQL Server"
+            "command": "mysql-scratchpad.mysqlConnect",
+            "title": "Connect",
+            "category": "MySQL"
         },{
-            "command": "extensions.executeCurrentLine",
-            "title": "Execute MySQL statement under cursor"
+            "command": "mysql-scratchpad.mysqlDisconnect",
+            "title": "Disconnect",
+            "category": "MySQL"
+        },{
+            "command": "mysql-scratchpad.executeCurrentLine",
+            "title": "Execute statement under cursor",
+            "category": "MySQL"
+        },{
+            "command": "mysql-scratchpad.openScratchpad",
+            "title": "Open Scratchpad",
+            "category": "MySQL"
         }]
     },
     "scripts": {

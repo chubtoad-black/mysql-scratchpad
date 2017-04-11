@@ -9,27 +9,30 @@ export class ConnectionController{
     }
 
     private _connection:Connection;
+    private _statusBarItem:vscode.StatusBarItem;
 
     constructor(){
+        this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right,99);
     }
 
     public dispose(){
-        this.closeConnection().then(null, (err)=>{
+        this.disconnect().then(null, (err)=>{
             console.error('error closing connection: ',err);
         })
     }
 
     public inputConnectionAndConnect(){
-        vscode.window.setStatusBarMessage('Connecting to MySQL server...');
+        this._statusBarItem.text ='Connecting to MySQL server...';
+        this._statusBarItem.show();
         MySQLUtil.getMysqlConnectionOptions()
             .then(options => this.connect(options))
-            .then((connectionOrError:Connection) => {    
-                vscode.window.setStatusBarMessage('MySQL Connected: '+this._connection.config.user+'@'+this._connection.config.host);
+            .then((connectionOrError:Connection) => {
+                this._statusBarItem.text = 'MySQL: '+this._connection.config.user+'@'+this._connection.config.host;
                 return this.openScratchpad();
             }, (error:QueryError) => {
-                vscode.window.setStatusBarMessage('');
-                vscode.window.setStatusBarMessage('Failed to connect to MySQL server', 3000);
-                return vscode.window.showErrorMessage("MySQL "+error.message);
+                this._statusBarItem.text = 'Failed to connect to MySQL server';
+                setTimeout(() => this._statusBarItem.hide(),3000);
+                return this.handleConnectionError(error);
             });
     }
     
@@ -47,6 +50,14 @@ export class ConnectionController{
         })
     }
     public closeConnection():Thenable<any>{
+        if(!this._connection){
+            return null;
+        }
+        return this.disconnect()
+                    .then(() => this._statusBarItem.hide(), 
+                        error => this.handleConnectionError(error));
+    }
+    private disconnect():Promise<any>{
         return new Promise<any>((resolve, reject) => {
             this._connection.end(err => {
                 if(err){
@@ -57,10 +68,13 @@ export class ConnectionController{
             })
         })
     }
-    private openScratchpad():Thenable<any> | any{
+    public openScratchpad():Thenable<any> | any{
         return vscode.workspace.openTextDocument({language:'sql'})
-                    .then(doc => vscode.window.showTextDocument(doc, vscode.ViewColumn.One, false));
+                    .then(doc => vscode.window.showTextDocument(doc));
     }
     
+    private handleConnectionError(error:QueryError):Thenable<any>{
+        return vscode.window.showErrorMessage("MySQL "+error.message);
+    }
     
 }
