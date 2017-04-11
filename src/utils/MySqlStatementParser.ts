@@ -1,11 +1,16 @@
 import {TextEditor, TextLine, Position, Range} from 'vscode';
 
+export interface StatementRange{
+    range:Range,
+    statement:string
+}
+
 export class MySqlStatementParser{
 
     constructor(private editor:TextEditor){
     }
 
-    public parseStatementUnderCursor():string{
+    public parseStatementAndRangeUnderCursor():StatementRange{
         let cursorPosition:Position = this.editor.selection.anchor;
 
         if(this.cursorIsInComment(cursorPosition)){
@@ -26,7 +31,10 @@ export class MySqlStatementParser{
         if(statement.length < 1){
             statement = null;
         }
-        return statement;
+        return {
+            statement:statement,
+            range: new Range(startPos,endPos)
+        };
     }
 
     private cursorIsInComment(cursorPosition:Position):boolean{

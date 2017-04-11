@@ -44,4 +44,9 @@ export class OutputChannelController{
         }
         OutputChannelController.outputChannel.appendLine(line);
     }
+
+    public dispose(){
+        OutputChannelController.outputChannel.hide();
+        OutputChannelController.outputChannel.dispose();
+    }
 }

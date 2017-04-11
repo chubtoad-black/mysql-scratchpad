@@ -28,45 +28,65 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
     }
 
     public provideTextDocumentContent(uri:Uri):Thenable<string>|string{
-        let output = `<head>
-                        <link rel="stylesheet" href="${MySqlResultDocumentContentProvider.resultCssPath}">
-                    </head>
-                    <h2>${this.currentStatement}</h2>`;
+        let output = this.head();
+
+        output += this.header();
         
         if(this.result){
             if(this.result instanceof Array){
-                output += this.buildTable();
+                output += this.table();
             }else{
-                output += this.buildUpdateResponse();
+                output += this.databaseUpdate();
             }
         }else{
-            output += "<p>no result!</p>";
+            output += "<p>No Result</p>";
         }
         return output;
     }
 
-    private buildTable():string{
-        let out = "<table><thead><tr>";
-        let columns = [];
-        let result0 = this.result[0];
-        for(let field in result0){
-            columns.push(field);
-            out+="<th>"+field+"</th>";
-        }
-        out+="</tr></thead><tbody>";
+    private head():string{
+        let head = `<head>
+                        <link rel="stylesheet" href="${MySqlResultDocumentContentProvider.resultCssPath}">
+                    </head>`;
+        return head;
+    }
 
-        for(let row of this.result){
-            out+="<tr>";
-            for(let col of columns){
-                out+="<td>"+row[col]+"</td>";
-            }
-            out+="</tr>"
+    private header():string{
+        let header = `<h2>${this.currentStatement}</h2>`
+        return header;
+    }
+
+    private table():string{
+        if(this.result.length < 1){
+            return "<p>Empty Result</p>";
         }
+        let out = "<table><thead><tr>";
+
+        let columns = [];
+        for(let col in this.result[0]){
+            columns.push(col);
+            out+=`<th>${col}</th>`;
+        }
+        
+        out+="</tr></thead><tbody>";
+        out += this.tableRows(columns);
         out +="</tbody></table>";
         return out;
     }
 
-    private buildUpdateResponse():string{
+    private tableRows(columns):string{
+        let out = "";
+        for(let row of this.result){
+            out+="<tr>";
+            for(let col of columns){
+                out+=`<td>${row[col]}</td>`;
+            }
+            out+="</tr>"
+        }
+        return out;
+    }
+
+    private databaseUpdate():string{
         return `<p>Affected Rows: ${this.result.affectedRows}</p>
                     <p>Warnings: ${this.result.warningCount}</p>
                     <p>${this.result.message}</p>`

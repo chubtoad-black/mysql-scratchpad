@@ -17,11 +17,9 @@ export class ConnectionController{
     }
 
     public dispose(){
-        this.disconnect().then(() => {
-            OutputChannelController.outputDisconnect();
-        }, (err)=>{
-            console.error('error closing connection: ',err);
-        })
+        this.disconnect()
+            .then(() => OutputChannelController.outputDisconnect(), 
+                (err)=>this.handleConnectionError(err));
     }
 
     public inputConnectionAndConnect(){
@@ -30,15 +28,8 @@ export class ConnectionController{
         OutputChannelController.showOutputChannel();
         MySQLUtil.getMysqlConnectionOptions()
             .then(options => this.connect(options))
-            .then((connection:Connection) => {
-                this._statusBarItem.text = 'MySQL: '+this._connection.config.user+'@'+this._connection.config.host;
-                OutputChannelController.outputConnection(connection);
-                return this.openScratchpad();
-            }, (error:QueryError) => {
-                this._statusBarItem.text = 'Failed to connect to MySQL server';
-                setTimeout(() => this._statusBarItem.hide(),3000);
-                return this.handleConnectionError(error);
-            });
+            .then((connection:Connection) => this.onConnectionSuccess(), 
+                (error:QueryError) => this.onConnectionFailure(error));
     }
     
     public connect(connectionOptions:ConnectionOptions):Promise<Connection>{
@@ -54,6 +45,19 @@ export class ConnectionController{
             })
         })
     }
+
+    private onConnectionSuccess():Thenable<any>{
+        this._statusBarItem.text = 'MySQL: '+this._connection.config.user+'@'+this._connection.config.host;
+        OutputChannelController.outputConnection(this._connection);
+        return this.openScratchpad();
+    }
+
+    private onConnectionFailure(error:QueryError):Thenable<any>{
+        this._statusBarItem.text = 'Failed to connect to MySQL server';
+        setTimeout(() => this._statusBarItem.hide(),3000);
+        return this.handleConnectionError(error);
+    }
+
     public closeConnection():Thenable<any>{
         if(!this._connection){
             return null;
