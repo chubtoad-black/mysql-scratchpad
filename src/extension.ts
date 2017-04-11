@@ -2,12 +2,14 @@
 import * as vscode from 'vscode';
 import {RequestController} from './controllers/RequestController';
 import {ConnectionController} from './controllers/ConnectionController';
+import {OutputChannelController} from './controllers/OutputChannelController';
 import {MySQLUtil} from './utils/MySQLUtil';
 
 export function activate(context: vscode.ExtensionContext) {
     let requestController = new RequestController();
     let connectionController = new ConnectionController();
-
+    let outputChannelController = new OutputChannelController();
+    
     context.subscriptions.push(requestController);
     context.subscriptions.push(connectionController);
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.mysqlConnect', () => connectionController.inputConnectionAndConnect()));
@@ -15,8 +17,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.executeCurrentLine', ()=> requestController.executeStatementUnderCursor()));
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.openScratchpad', () => connectionController.openScratchpad()));
 }
-
-
 
 // this method is called when your extension is deactivated
 export function deactivate() {

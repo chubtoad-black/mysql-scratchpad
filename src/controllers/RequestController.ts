@@ -2,6 +2,7 @@ import {window, workspace, commands, Range, TextEditor, Disposable, Uri, TextDoc
 import {ConnectionController} from './ConnectionController';
 import {MySqlResultDocumentContentProvider} from '../views/MySqlResultDocumentContentProvider';
 import {MySqlStatementParser} from '../utils/MySqlStatementParser';
+import {OutputChannelController} from './OutputChannelController';
 
 export class RequestController{
     private _resultDocumentProvider:MySqlResultDocumentContentProvider;
@@ -23,15 +24,24 @@ export class RequestController{
         if(!statement){
             return;
         }
-        console.log("selected statement: ",statement);
         this._resultDocumentProvider.setStatement(statement);
         this.execute(statement)
             .then(result => {
+                OutputChannelController.outputSuccesss({
+                    statement:statement,
+                    message:result.message
+                });
                 this._resultDocumentProvider.setResult(result);
                 let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
                 this._resultDocumentProvider.refresh(uri);
                 commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'MySQL Result');
-            })
+            }, (error) => {
+                window.showErrorMessage(error.message);
+                OutputChannelController.outputError({
+                    message: error.message,
+                    statement: statement
+                })
+            });
         
     }
 
@@ -41,12 +51,12 @@ export class RequestController{
             if(connection){
                 connection.query(sql, args, (err, result, fields) => {
                     if(err){
-                        reject('Error: '+err);
+                        reject(err);
                     }
                     resolve(result);
                 })
             }else{
-                reject('No connection');
+                reject({message: 'No Connection'});
             }
         });
     }

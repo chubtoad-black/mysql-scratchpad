@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import {MySQLUtil} from '../utils/MySQLUtil';
+import {OutputChannelController} from './OutputChannelController';
 import {Connection, ConnectionOptions, createConnection, QueryError} from 'mysql';
 
 export class ConnectionController{
@@ -16,7 +17,9 @@ export class ConnectionController{
     }
 
     public dispose(){
-        this.disconnect().then(null, (err)=>{
+        this.disconnect().then(() => {
+            OutputChannelController.outputDisconnect();
+        }, (err)=>{
             console.error('error closing connection: ',err);
         })
     }
@@ -24,10 +27,12 @@ export class ConnectionController{
     public inputConnectionAndConnect(){
         this._statusBarItem.text ='Connecting to MySQL server...';
         this._statusBarItem.show();
+        OutputChannelController.showOutputChannel();
         MySQLUtil.getMysqlConnectionOptions()
             .then(options => this.connect(options))
-            .then((connectionOrError:Connection) => {
+            .then((connection:Connection) => {
                 this._statusBarItem.text = 'MySQL: '+this._connection.config.user+'@'+this._connection.config.host;
+                OutputChannelController.outputConnection(connection);
                 return this.openScratchpad();
             }, (error:QueryError) => {
                 this._statusBarItem.text = 'Failed to connect to MySQL server';
