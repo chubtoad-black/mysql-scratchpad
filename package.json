@@ -15,21 +15,22 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
-            "command": "mysql-scratchpad.mysqlConnect",
-            "title": "Connect",
-            "category": "MySQL"
-        },{
-            "command": "mysql-scratchpad.mysqlDisconnect",
-            "title": "Disconnect",
-            "category": "MySQL"
-        },{
+        "commands": [
+        {
             "command": "mysql-scratchpad.executeCurrentLine",
             "title": "Execute statement under cursor",
             "category": "MySQL"
         },{
+            "command": "mysql-scratchpad.mysqlConnect",
+            "title": "Connect",
+            "category": "MySQL"
+        },{
             "command": "mysql-scratchpad.openScratchpad",
             "title": "Open Scratchpad",
+            "category": "MySQL"
+        },{
+            "command": "mysql-scratchpad.mysqlDisconnect",
+            "title": "Disconnect",
             "category": "MySQL"
         }]
     },
