@@ -16,6 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.mysqlDisconnect', ()=> connectionController.closeConnection()));
     context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeCurrentLine', editor => requestController.executeStatementUnderCursor(editor)));
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.openScratchpad', () => connectionController.openScratchpad()));
+    context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeEntireFile', editor => requestController.executeEntireFile(editor)));
 }
 
 // this method is called when your extension is deactivated

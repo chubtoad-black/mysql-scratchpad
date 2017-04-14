@@ -32,6 +32,10 @@
             "command": "mysql-scratchpad.mysqlDisconnect",
             "title": "Disconnect",
             "category": "MySQL"
+        },{
+            "command": "mysql-scratchpad.executeEntireFile",
+            "title": "Execute entire file",
+            "category": "MySQL"
         }]
     },
     "scripts": {

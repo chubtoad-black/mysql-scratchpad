@@ -7,6 +7,7 @@ import {OutputChannelController} from './OutputChannelController';
 export class RequestController{
     private _resultDocumentProvider:MySqlResultDocumentContentProvider;
     private _resultDocumentRegistration:Disposable;
+    private _timer:number;
 
     constructor(){
         this._resultDocumentProvider = new MySqlResultDocumentContentProvider();
@@ -28,9 +29,24 @@ export class RequestController{
         this._resultDocumentProvider.setStatement(parsed.statement);
 
         this.execute(parsed.statement)
-            .then(result => this.onExecutionSuccess(result, parsed.statement), 
+            .then(result => this.onSingleStatementExecutionSuccess(result, parsed.statement), 
                 (error) => this.onExecutionError(error, parsed.statement));
         
+    }
+
+    public executeEntireFile(editor:TextEditor){
+        if(!editor || !editor.document){
+            return;
+        }
+
+        if(editor.document.languageId !== 'sql'){
+            window.showWarningMessage('Cannot execute a non-sql file.');
+        }
+
+        let statements = editor.document.getText();
+        this.execute(statements)
+            .then(result => this.onEntireFileExecutionSuccess(result, statements.split(';')),
+                    error => console.log("error: ",error));
     }
 
     private updateDecorations(editor:TextEditor, range:Range){
@@ -51,7 +67,9 @@ export class RequestController{
         return new Promise<any>((resolve, reject) => {
             let connection = ConnectionController.getConnection();
             if(connection){
+                this._timer = new Date().getTime();
                 connection.query(sql, args, (err, result, fields) => {
+                    this._timer = (new Date().getTime()) - this._timer;
                     if(err){
                         reject(err);
                     }
@@ -63,15 +81,29 @@ export class RequestController{
         });
     }
 
-    private onExecutionSuccess(result, statement){
+    private onSingleStatementExecutionSuccess(result, statement){
         OutputChannelController.outputSuccesss({
             statement:statement,
             message:result.message
         });
         this._resultDocumentProvider.setResult(result);
+        this._resultDocumentProvider.setTimeTaken(this._timer);
         let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
         this._resultDocumentProvider.refresh(uri);
         commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'MySQL Result');
+    }
+
+    private onEntireFileExecutionSuccess(result, statements){
+        for(let statement of statements){
+            if(statement && statement.length > 0){
+                OutputChannelController.outputSuccesss({
+                    statement: statement,
+                    message: null
+                });
+            }
+        }
+        // display each statement result on new tab?
+        // display each statement result below the next on a single tab? too big?
     }
 
     private onExecutionError(error, statement){
@@ -79,7 +111,7 @@ export class RequestController{
         OutputChannelController.outputError({
             message: error.message,
             statement: statement
-        })
+        });
     }
 
     public dispose(){

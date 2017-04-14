@@ -5,6 +5,7 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
 
     private result:any;
     private currentStatement:string;
+    private timeTaken:number;
     private static resultCssPath:string = path.join(extensions.getExtension('jblack.mysql-scratchpad').extensionPath, 'styles','result.css');
     private _onDidChange = new EventEmitter<Uri>();
     
@@ -25,6 +26,10 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
 
     public setResult(r:any){
         this.result = r;
+    }
+
+    public setTimeTaken(millis:number){
+        this.timeTaken = millis;
     }
 
     public provideTextDocumentContent(uri:Uri):Thenable<string>|string{
@@ -52,7 +57,8 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
     }
 
     private header():string{
-        let header = `<h2>${this.currentStatement}</h2>`
+        let header = `<h2>${this.currentStatement}</h2>
+                        <p>Time taken: ${this.timeTaken/1000} seconds</p>`;
         return header;
     }
 
