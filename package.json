@@ -21,6 +21,10 @@
             "title": "Execute statement under cursor",
             "category": "MySQL"
         },{
+            "command": "mysql-scratchpad.executeSelectedText",
+            "title": "Execute selected text as MySQL statement",
+            "category": "MySQL"    
+        },{
             "command": "mysql-scratchpad.mysqlConnect",
             "title": "Connect",
             "category": "MySQL"
@@ -36,7 +40,25 @@
             "command": "mysql-scratchpad.executeEntireFile",
             "title": "Execute entire file",
             "category": "MySQL"
-        }]
+        }],
+        "menus":{
+            "editor/context": [{
+                "command": "mysql-scratchpad.executeSelectedText",
+                "when": "editorHasSelection === true",
+                "group": "10_mysql"
+            }]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "MySQL Scratchpad Configuration",
+            "properties": {
+                "mysql-scratchpad.openResultsInNewTab":{
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Open mysql results in a new result tab."
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",

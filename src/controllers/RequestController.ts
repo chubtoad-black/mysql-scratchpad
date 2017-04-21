@@ -49,6 +49,21 @@ export class RequestController{
                     error => console.log("error: ",error));
     }
 
+    public executeSelectedText(editor:TextEditor){
+        if(!editor || !editor.document){
+            return;
+        }
+
+        if(editor.selection.isEmpty){
+            return;
+        }
+
+        let statement = editor.document.getText(editor.selection);
+        this.execute(statement)
+            .then(result => this.onSingleStatementExecutionSuccess(result, statement), 
+                (error) => this.onExecutionError(error, statement));
+    }
+
     private updateDecorations(editor:TextEditor, range:Range){
         let options = {
                 light:{
