@@ -58,7 +58,13 @@
                     "description": "Open mysql results in a new result tab."
                 }
             }
-        }
+        },
+        "keybindings": [{
+            "command": "mysql-scratchpad.executeCurrentLine",
+            "key": "ctrl+shift+enter",
+            "mac": "cmd+shift+enter",
+            "when": "editorTextFocus && editorLangId == sql"
+        }]
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
