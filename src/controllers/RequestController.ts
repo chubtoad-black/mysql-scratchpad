@@ -59,6 +59,8 @@ export class RequestController{
         }
 
         let statement = editor.document.getText(editor.selection);
+        
+        this._resultDocumentProvider.setStatement(statement);
         this.execute(statement)
             .then(result => this.onSingleStatementExecutionSuccess(result, statement), 
                 (error) => this.onExecutionError(error, statement));

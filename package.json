@@ -44,7 +44,7 @@
         "menus":{
             "editor/context": [{
                 "command": "mysql-scratchpad.executeSelectedText",
-                "when": "editorHasSelection === true",
+                "when": "editorHasSelection",
                 "group": "10_mysql"
             }]
         },
