@@ -2,6 +2,12 @@ table{
     border-collapse:collapse;
 }
 td, th{
-    border: 1px solid #fff;
     padding: 0.5rem 1rem;
+}
+.vscode-dark td, .vscode-dark th,
+.vscode-high-contrast td, .vscode-high-contrast th{
+    border: 1px solid #fff;
+}
+.vscode-light td, .vscode-light th{
+    border: 1px solid #000;
 }
