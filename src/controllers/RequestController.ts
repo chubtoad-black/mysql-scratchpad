@@ -29,7 +29,7 @@ export class RequestController{
         this._resultDocumentProvider.setStatement(parsed.statement);
 
         this.execute(parsed.statement)
-            .then(result => this.onSingleStatementExecutionSuccess(result, parsed.statement), 
+            .then(result => this.onSingleStatementExecutionSuccess(result, parsed.statement, editor), 
                 (error) => this.onExecutionError(error, parsed.statement));
         
     }
@@ -59,10 +59,10 @@ export class RequestController{
         }
 
         let statement = editor.document.getText(editor.selection);
-        
+
         this._resultDocumentProvider.setStatement(statement);
         this.execute(statement)
-            .then(result => this.onSingleStatementExecutionSuccess(result, statement), 
+            .then(result => this.onSingleStatementExecutionSuccess(result, statement, editor), 
                 (error) => this.onExecutionError(error, statement));
     }
 
@@ -98,7 +98,7 @@ export class RequestController{
         });
     }
 
-    private onSingleStatementExecutionSuccess(result, statement){
+    private onSingleStatementExecutionSuccess(result, statement, editor:TextEditor){
         OutputChannelController.outputSuccesss({
             statement:statement,
             message:result.message
@@ -108,6 +108,7 @@ export class RequestController{
         let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
         this._resultDocumentProvider.refresh(uri);
         commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'MySQL Result');
+        window.showTextDocument(editor.document, 1, false);
     }
 
     private onEntireFileExecutionSuccess(result, statements){

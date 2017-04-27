@@ -61,8 +61,8 @@
         },
         "keybindings": [{
             "command": "mysql-scratchpad.executeCurrentLine",
-            "key": "ctrl+shift+enter",
-            "mac": "cmd+shift+enter",
+            "key": "ctrl+enter",
+            "mac": "cmd+enter",
             "when": "editorTextFocus && editorLangId == sql"
         }]
     },
