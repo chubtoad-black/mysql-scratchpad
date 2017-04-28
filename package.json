@@ -56,6 +56,21 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Open mysql results in a new result tab."
+                },
+                "mysql-scratchpad.defaultMysqlPort":{
+                    "type":"integer",
+                    "default": 3306,
+                    "description": "Default port when connecting to a MySQL server."
+                },
+                "mysql-scratchpad.promptForPort":{
+                    "type":"boolean",
+                    "default":false,
+                    "description": "Prompt for port when making connection to a MySQL server."
+                },
+                "mysql-scratchpad.promptForDatabase":{
+                    "type":"boolean",
+                    "default":false,
+                    "description": "Prompt for database to use when making a connection."
                 }
             }
         },
