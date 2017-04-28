@@ -98,7 +98,7 @@ export class RequestController{
         });
     }
 
-    private onSingleStatementExecutionSuccess(result, statement, editor:TextEditor){
+    private onSingleStatementExecutionSuccess(result, statement:string, editor:TextEditor){
         OutputChannelController.outputSuccesss({
             statement:statement,
             message:result.message
@@ -111,7 +111,7 @@ export class RequestController{
         window.showTextDocument(editor.document, 1, false);
     }
 
-    private onEntireFileExecutionSuccess(result, statements){
+    private onEntireFileExecutionSuccess(result, statements:string[]){
         for(let statement of statements){
             if(statement && statement.length > 0){
                 OutputChannelController.outputSuccesss({
