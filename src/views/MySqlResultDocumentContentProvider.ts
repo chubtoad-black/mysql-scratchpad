@@ -1,11 +1,8 @@
 import {TextDocumentContentProvider, Uri, EventEmitter, Event, extensions} from 'vscode';
 import * as path from 'path';
+import {ResultStore, MySQLResult} from '../utils/ResultStore';
 
 export class MySqlResultDocumentContentProvider implements TextDocumentContentProvider{
-
-    private result:any;
-    private currentStatement:string;
-    private timeTaken:number;
     private static resultCssPath:string = path.join(extensions.getExtension('jblack.mysql-scratchpad').extensionPath, 'styles','result.css');
     private _onDidChange = new EventEmitter<Uri>();
     
@@ -20,28 +17,17 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
         this._onDidChange.fire(uri);
     }
 
-    public setStatement(s:string){
-        this.currentStatement = s;
-    }
-
-    public setResult(r:any){
-        this.result = r;
-    }
-
-    public setTimeTaken(millis:number){
-        this.timeTaken = millis;
-    }
-
     public provideTextDocumentContent(uri:Uri):Thenable<string>|string{
-        let output = this.head();
+        let storedResult = ResultStore.get(uri.toString());
 
-        output += this.header();
+        let output = this.head();
+        output += this.header(storedResult);
         
-        if(this.result){
-            if(this.result instanceof Array){
-                output += this.table();
+        if(storedResult){
+            if(storedResult.result instanceof Array){
+                output += this.table(storedResult);
             }else{
-                output += this.databaseUpdate();
+                output += this.databaseUpdate(storedResult);
             }
         }else{
             output += "<p>No Result</p>";
@@ -56,34 +42,34 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
         return head;
     }
 
-    private header():string{
-        let header = `<h2>${this.currentStatement}</h2>
-                        <p>Time taken: ${this.timeTaken/1000} seconds</p>
-                        <p>${this.result.message}`;
+    private header(storedResult:MySQLResult):string{
+        let header = `<h2>${storedResult.statement}</h2>
+                        <p>Time taken: ${storedResult.timeTaken/1000} seconds</p>
+                        <p>${storedResult.result.message}`;
         return header;
     }
 
-    private table():string{
-        if(this.result.length < 1){
+    private table(storedResult:MySQLResult):string{
+        if(storedResult.result.length < 1){
             return "<p>Empty Result</p>";
         }
         let out = "<table><thead><tr>";
 
         let columns = [];
-        for(let col in this.result[0]){
+        for(let col in storedResult.result[0]){
             columns.push(col);
             out+=`<th>${col}</th>`;
         }
         
         out+="</tr></thead><tbody>";
-        out += this.tableRows(columns);
+        out += this.tableRows(columns, storedResult);
         out +="</tbody></table>";
         return out;
     }
 
-    private tableRows(columns):string{
+    private tableRows(columns:string[], storedResult:MySQLResult):string{
         let out = "";
-        for(let row of this.result){
+        for(let row of storedResult.result){
             out+="<tr>";
             for(let col of columns){
                 out+=`<td>${row[col]}</td>`;
@@ -93,10 +79,10 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
         return out;
     }
 
-    private databaseUpdate():string{
-        return `<p>Affected Rows: ${this.result.affectedRows}</p>
-                    <p>Warnings: ${this.result.warningCount}</p>
-                    <p>${this.result.message}</p>`
+    private databaseUpdate(storedResult:MySQLResult):string{
+        return `<p>Affected Rows: ${storedResult.result.affectedRows}</p>
+                    <p>Warnings: ${storedResult.result.warningCount}</p>
+                    <p>${storedResult.result.message}</p>`
     }
 }
 

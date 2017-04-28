@@ -3,6 +3,7 @@ import {ConnectionController} from './ConnectionController';
 import {MySqlResultDocumentContentProvider} from '../views/MySqlResultDocumentContentProvider';
 import {MySqlStatementParser} from '../utils/MySqlStatementParser';
 import {OutputChannelController} from './OutputChannelController';
+import {ResultStore} from '../utils/ResultStore';
 
 export class RequestController{
     private _resultDocumentProvider:MySqlResultDocumentContentProvider;
@@ -26,7 +27,6 @@ export class RequestController{
         if(!parsed || !parsed.statement){
             return;
         }
-        this._resultDocumentProvider.setStatement(parsed.statement);
 
         this.execute(parsed.statement)
             .then(result => this.onSingleStatementExecutionSuccess(result, parsed.statement, editor), 
@@ -60,7 +60,6 @@ export class RequestController{
 
         let statement = editor.document.getText(editor.selection);
 
-        this._resultDocumentProvider.setStatement(statement);
         this.execute(statement)
             .then(result => this.onSingleStatementExecutionSuccess(result, statement, editor), 
                 (error) => this.onExecutionError(error, statement));
@@ -103,11 +102,21 @@ export class RequestController{
             statement:statement,
             message:result.message
         });
-        this._resultDocumentProvider.setResult(result);
-        this._resultDocumentProvider.setTimeTaken(this._timer);
-        let uri:Uri = Uri.parse('mysql-scratchpad://authority/result');
+        let tabTitle = "MySQL Result";
+        let uriString = 'mysql-scratchpad://authority/result'
+        if(workspace.getConfiguration('mysql-scratchpad').get('openResultsInNewTab')){
+            uriString += (new Date()).getTime();
+            tabTitle += ` ${ResultStore.count()+1}`;
+        }
+        ResultStore.add(uriString, {
+            statement:statement,
+            result:result,
+            uri:uriString,
+            timeTaken:this._timer
+        });
+        let uri:Uri = Uri.parse(uriString);
         this._resultDocumentProvider.refresh(uri);
-        commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, 'MySQL Result');
+        commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, tabTitle);
         window.showTextDocument(editor.document, 1, false);
     }
 

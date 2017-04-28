@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {MySQLUtil} from '../utils/MySQLUtil';
 import {OutputChannelController} from './OutputChannelController';
 import {Connection, ConnectionOptions, createConnection, QueryError} from 'mysql';
+import {ResultStore} from '../utils/ResultStore';
 
 export class ConnectionController{
     private static mysqlConnection:Connection;
@@ -64,6 +65,7 @@ export class ConnectionController{
         }
         return this.disconnect()
                     .then(() => {
+                            ResultStore.clear();
                             this._statusBarItem.hide();
                             vscode.window.showInformationMessage('MySQL connection closed.',{});
                         }, 
