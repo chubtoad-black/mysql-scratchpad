@@ -44,8 +44,10 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
 
     private header(storedResult:MySQLResult):string{
         let header = `<h2>${storedResult.statement}</h2>
-                        <p>Time taken: ${storedResult.timeTaken/1000} seconds</p>
-                        <p>${storedResult.result.message}`;
+                        <p>Time taken: ${storedResult.timeTaken/1000} seconds</p>`;
+        if(storedResult.result.message){
+            header += `<p>${storedResult.result.message}`;
+        }
         return header;
     }
 

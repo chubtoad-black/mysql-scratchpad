@@ -32,5 +32,6 @@ export class ResultStore{
 
     public static clear(){
         this.store.clear();
+        this.nth = 0;
     }
 }
