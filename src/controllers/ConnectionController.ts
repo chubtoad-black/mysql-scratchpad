@@ -63,7 +63,10 @@ export class ConnectionController{
             return null;
         }
         return this.disconnect()
-                    .then(() => this._statusBarItem.hide(), 
+                    .then(() => {
+                            this._statusBarItem.hide();
+                            vscode.window.showInformationMessage('MySQL connection closed.',{});
+                        }, 
                         error => this.handleConnectionError(error));
     }
     private disconnect():Promise<any>{
