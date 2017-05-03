@@ -21,7 +21,12 @@ export class MySqlStatementParser{
         let endPos;
         if(this.cursorAndStatementStartAtEndOfLine(startPos.character, this.editor.document.lineAt(cursorPosition.line))){
             startPos = this.getStartOfStatement(cursorPosition.line, startPos.character-1);
-            endPos = this.getEndOfStatement(cursorPosition.line, startPos.character-1);
+            if(startPos.line !== cursorPosition.line){
+                endPos = this.getEndOfStatement(cursorPosition.line, cursorPosition.character-1);
+            }else{
+                endPos = this.getEndOfStatement(cursorPosition.line, startPos.character-1);
+
+            }
         }else{
             endPos = this.getEndOfStatement(cursorPosition.line, cursorPosition.character);
         }
