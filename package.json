@@ -57,6 +57,11 @@
                     "default": false,
                     "description": "Open mysql results in a new result tab."
                 },
+                "mysql-scratchpad.resultCacheSize":{
+                    "type":"integer",
+                    "default":10,
+                    "description": "The number of results that are cached when openResultsInNewTab is set to true. The oldest result is removed when storing a new result."
+                },
                 "mysql-scratchpad.defaultMysqlPort":{
                     "type":"integer",
                     "default": 3306,

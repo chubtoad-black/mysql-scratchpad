@@ -11,3 +11,6 @@ td, th{
 .vscode-light td, .vscode-light th{
     border: 1px solid #000;
 }
+.cacheExpiredMessage{
+    font-size: 18px;
+}
