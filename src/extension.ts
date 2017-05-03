@@ -20,12 +20,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.openScratchpad', () => connectionController.openScratchpad()));
     context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeEntireFile', editor => requestController.executeEntireFile(editor)));
     context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeSelectedText', editor => requestController.executeSelectedText(editor)));
-
-    context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(document => {
-        if(document.uri.scheme === 'mysql-scratchpad'){
-            ResultStore.remove(document.uri.toString());
-        }
-    }))
 }
 
 // this method is called when your extension is deactivated
