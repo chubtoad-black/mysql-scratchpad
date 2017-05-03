@@ -21,16 +21,16 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
         let storedResult = ResultStore.get(uri.toString());
 
         let output = this.head();
-        output += this.header(storedResult);
-        
         if(storedResult){
+            output += this.header(storedResult);
+        
             if(storedResult.result instanceof Array){
                 output += this.table(storedResult);
             }else{
                 output += this.databaseUpdate(storedResult);
             }
         }else{
-            output += "<p>No Result</p>";
+            output += "<p class='cacheExpiredMessage'>Result is no longer cached.</p><p>Change the 'resultCacheSize' setting to change the size of the result cache.</p>";
         }
         return output;
     }
