@@ -80,7 +80,7 @@
             }
         },
         "keybindings": [{
-            "command": "mysql-scratchpad.executeCurrentLine",
+            "command": "mysql-scratchpad.executeCurrentStatement",
             "key": "ctrl+enter",
             "mac": "cmd+enter",
             "when": "editorTextFocus && editorLangId == sql"
