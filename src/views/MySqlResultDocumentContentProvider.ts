@@ -1,6 +1,7 @@
 import {TextDocumentContentProvider, Uri, EventEmitter, Event, extensions} from 'vscode';
 import * as path from 'path';
 import {ResultCache, MySQLResult} from '../utils/ResultCache';
+import {QueryError} from 'mysql';
 
 export class MySqlResultDocumentContentProvider implements TextDocumentContentProvider{
     private static resultCssPath:string = path.join(extensions.getExtension('jblack.mysql-scratchpad').extensionPath, 'styles','result.css');
@@ -24,7 +25,9 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
         if(storedResult){
             output += this.header(storedResult);
         
-            if(storedResult.result instanceof Array){
+            if(storedResult.error){
+                output += this.error(storedResult);
+            }else if(storedResult.result instanceof Array){
                 output += this.table(storedResult);
             }else{
                 output += this.databaseUpdate(storedResult);
@@ -45,7 +48,7 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
     private header(storedResult:MySQLResult):string{
         let header = `<h2>${storedResult.statement}</h2>
                         <p>Time taken: ${storedResult.timeTaken/1000} seconds</p>`;
-        if(storedResult.result.message){
+        if(storedResult.result && storedResult.result.message){
             header += `<p>${storedResult.result.message}`;
         }
         return header;
@@ -85,6 +88,13 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
         return `<p>Affected Rows: ${storedResult.result.affectedRows}</p>
                     <p>Warnings: ${storedResult.result.warningCount}</p>
                     <p>${storedResult.result.message}</p>`
+    }
+
+    private error(result:MySQLResult):string{
+        return `<h4>Error</h4>
+        <p>Code: ${result.error.code}</p>
+        <p>Message: ${result.error.message.replace(result.error.code+":", "")}</p>
+        `
     }
 }
 

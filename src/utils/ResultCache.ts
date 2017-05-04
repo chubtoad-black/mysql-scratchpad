@@ -1,15 +1,17 @@
-import * as vscode from 'vscode';
+import {workspace} from 'vscode';
+import {QueryError} from 'mysql';
 
 export interface MySQLResult{
     statement:string,
     result:any,
     uri:string,
-    timeTaken:number
+    timeTaken:number,
+    error:QueryError
 }
 
 export class ResultCache{
     
-    private static CACHE_SIZE = vscode.workspace.getConfiguration('mysql-scratchpad').get<number>('resultCacheSize') | 10;
+    private static CACHE_SIZE = workspace.getConfiguration('mysql-scratchpad').get<number>('resultCacheSize') | 10;
     private static store:Map<string, MySQLResult> = new Map<string, MySQLResult>();
     private static cacheWindow:Array<string> = new Array<string>();
     private static nth:number = 0;

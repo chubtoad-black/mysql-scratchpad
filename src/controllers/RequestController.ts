@@ -30,7 +30,7 @@ export class RequestController{
 
         this.execute(parsed.statement)
             .then(result => this.onSingleStatementExecutionSuccess(result, parsed.statement, editor), 
-                (error) => this.onExecutionError(error, parsed.statement));
+                (error) => this.onExecutionError(error, parsed.statement, editor));
         
     }
 
@@ -46,7 +46,7 @@ export class RequestController{
         let statements = editor.document.getText();
         this.execute(statements)
             .then(result => this.onEntireFileExecutionSuccess(result, statements.split(';')),
-                    error => console.log("error: ",error));
+                    error => this.onExecutionError(error, statements, editor));
     }
 
     public executeSelectedText(editor:TextEditor){
@@ -62,7 +62,7 @@ export class RequestController{
 
         this.execute(statement)
             .then(result => this.onSingleStatementExecutionSuccess(result, statement, editor), 
-                (error) => this.onExecutionError(error, statement));
+                error => this.onExecutionError(error, statement, editor));
     }
 
     private updateDecorations(editor:TextEditor, range:Range){
@@ -102,21 +102,38 @@ export class RequestController{
             statement:statement,
             message:result.message
         });
-        let tabTitle = "MySQL Result";
+        
+        let uri = this.getResultUri();
+        ResultCache.add(uri.toString(), {
+            statement:statement,
+            result:result,
+            uri:uri.toString(),
+            timeTaken:this._timer,
+            error: null
+        });
+
+        this.openResult(uri, editor);
+    }
+
+    private getResultUri():Uri{
         let uriString = 'mysql-scratchpad://authority/result'
         if(workspace.getConfiguration('mysql-scratchpad').get('openResultsInNewTab')){
             uriString += (new Date()).getTime();
+        }
+        return Uri.parse(uriString);
+    }
+
+    private getResultTabTitle():string{
+        let tabTitle = "MySQL Result";
+        if(workspace.getConfiguration('mysql-scratchpad').get('openResultsInNewTab')){
             tabTitle += ` ${ResultCache.count()+1}`;
         }
-        ResultCache.add(uriString, {
-            statement:statement,
-            result:result,
-            uri:uriString,
-            timeTaken:this._timer
-        });
-        let uri:Uri = Uri.parse(uriString);
+        return tabTitle;
+    }
+
+    private openResult(uri:Uri, editor){
         this._resultDocumentProvider.refresh(uri);
-        commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, tabTitle);
+        commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, this.getResultTabTitle());
         window.showTextDocument(editor.document, 1, false);
     }
 
@@ -129,16 +146,30 @@ export class RequestController{
                 });
             }
         }
-        // display each statement result on new tab?
-        // display each statement result below the next on a single tab? too big?
     }
 
-    private onExecutionError(error, statement){
-        window.showErrorMessage(error.message);
+    private onExecutionError(error, statement, editor){
+        if(statement instanceof Array){
+            //Todo: think of something for the case of multiple statements
+            statement = null;
+        }else{
+            let uri = this.getResultUri();
+            ResultCache.add(uri.toString(), {
+                statement:statement,
+                result:null,
+                uri:uri.toString(),
+                timeTaken:this._timer,
+                error: error
+            });
+
+            this.openResult(uri, editor);
+            
+        }
         OutputChannelController.outputError({
             message: error.message,
             statement: statement
         });
+
     }
 
     public dispose(){
