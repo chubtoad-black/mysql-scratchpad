@@ -22,11 +22,11 @@ export class RequestController{
 
         let parsed = new MySqlStatementParser(editor).parseStatementAndRangeUnderCursor();
 
-        this.updateDecorations(editor, parsed.range);
-
         if(!parsed || !parsed.statement){
             return;
         }
+
+        this.updateDecorations(editor, parsed.range);
 
         this.execute(parsed.statement)
             .then(result => this.onSingleStatementExecutionSuccess(result, parsed.statement, editor), 

@@ -13,6 +13,10 @@ export class MySqlStatementParser{
     public parseStatementAndRangeUnderCursor():StatementRange{
         let cursorPosition:Position = this.editor.selection.anchor;
 
+        if(this.cursorIsInEmptyLine(cursorPosition)){
+            return null;
+        }
+
         if(this.cursorIsInComment(cursorPosition)){
             return null;
         }
@@ -25,12 +29,12 @@ export class MySqlStatementParser{
                 endPos = this.getEndOfStatement(cursorPosition.line, cursorPosition.character-1);
             }else{
                 endPos = this.getEndOfStatement(cursorPosition.line, startPos.character-1);
-
             }
         }else{
             endPos = this.getEndOfStatement(cursorPosition.line, cursorPosition.character);
         }
 
+        startPos = this.removeWhitespaceFromStartPos(startPos, endPos);
         let statement = this.stripComments(startPos, endPos);
 
         if(statement.length < 1){
@@ -40,6 +44,11 @@ export class MySqlStatementParser{
             statement:statement,
             range: new Range(startPos,endPos)
         };
+    }
+
+    private cursorIsInEmptyLine(cursorPosition:Position):boolean{
+        let line = this.editor.document.lineAt(cursorPosition.line);
+        return line.isEmptyOrWhitespace;
     }
 
     private cursorIsInComment(cursorPosition:Position):boolean{
@@ -120,9 +129,20 @@ export class MySqlStatementParser{
         return line;
     }
 
-    public parseSelectedStatements():string{
-        return null;
+    private removeWhitespaceFromStartPos(startPos:Position, endPos:Position):Position{
+        let statement:string = this.editor.document.getText(new Range(startPos, endPos));
+        let preLength = statement.length;
+        statement = this.trimLeft(statement);
+        let difference = preLength - statement.length;
+        if(difference > 0){
+            let offset = this.editor.document.offsetAt(startPos);
+            startPos = this.editor.document.positionAt(offset+difference);
+        }
+        
+        return startPos;
     }
-
+    private trimLeft(input:string):string{
+        return input.replace(/^[\s\uFEFF\xA0]+/g, '');
+    }
 
 }
