@@ -7,7 +7,7 @@ export interface MySQLResult{
     timeTaken:number
 }
 
-export class ResultStore{
+export class ResultCache{
     
     private static CACHE_SIZE = vscode.workspace.getConfiguration('mysql-scratchpad').get<number>('resultCacheSize') | 10;
     private static store:Map<string, MySQLResult> = new Map<string, MySQLResult>();

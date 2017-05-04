@@ -4,7 +4,7 @@ import {RequestController} from './controllers/RequestController';
 import {ConnectionController} from './controllers/ConnectionController';
 import {OutputChannelController} from './controllers/OutputChannelController';
 import {MySQLUtil} from './utils/MySQLUtil';
-import {ResultStore} from './utils/ResultStore';
+import {ResultCache} from './utils/ResultCache';
 
 export function activate(context: vscode.ExtensionContext) {
     let requestController = new RequestController();
@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(outputChannelController);
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.mysqlConnect', () => connectionController.inputConnectionAndConnect()));
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.mysqlDisconnect', ()=> connectionController.closeConnection()));
-    context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeCurrentLine', editor => requestController.executeStatementUnderCursor(editor)));
+    context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeCurrentStatement', editor => requestController.executeStatementUnderCursor(editor)));
     context.subscriptions.push(vscode.commands.registerCommand('mysql-scratchpad.openScratchpad', () => connectionController.openScratchpad()));
     context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeEntireFile', editor => requestController.executeEntireFile(editor)));
     context.subscriptions.push(vscode.commands.registerTextEditorCommand('mysql-scratchpad.executeSelectedText', editor => requestController.executeSelectedText(editor)));
@@ -24,5 +24,5 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-    ResultStore.clear();
+    ResultCache.clear();
 }

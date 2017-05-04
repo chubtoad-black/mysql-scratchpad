@@ -3,7 +3,7 @@ import {ConnectionController} from './ConnectionController';
 import {MySqlResultDocumentContentProvider} from '../views/MySqlResultDocumentContentProvider';
 import {MySqlStatementParser} from '../utils/MySqlStatementParser';
 import {OutputChannelController} from './OutputChannelController';
-import {ResultStore} from '../utils/ResultStore';
+import {ResultCache} from '../utils/ResultCache';
 
 export class RequestController{
     private _resultDocumentProvider:MySqlResultDocumentContentProvider;
@@ -19,8 +19,8 @@ export class RequestController{
         if(!editor || !editor.document){
             return;
         }
-        let parser = new MySqlStatementParser(editor);
-        let parsed = parser.parseStatementAndRangeUnderCursor();
+
+        let parsed = new MySqlStatementParser(editor).parseStatementAndRangeUnderCursor();
 
         this.updateDecorations(editor, parsed.range);
 
@@ -106,9 +106,9 @@ export class RequestController{
         let uriString = 'mysql-scratchpad://authority/result'
         if(workspace.getConfiguration('mysql-scratchpad').get('openResultsInNewTab')){
             uriString += (new Date()).getTime();
-            tabTitle += ` ${ResultStore.count()+1}`;
+            tabTitle += ` ${ResultCache.count()+1}`;
         }
-        ResultStore.add(uriString, {
+        ResultCache.add(uriString, {
             statement:statement,
             result:result,
             uri:uriString,

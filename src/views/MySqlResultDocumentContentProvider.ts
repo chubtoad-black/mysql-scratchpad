@@ -1,6 +1,6 @@
 import {TextDocumentContentProvider, Uri, EventEmitter, Event, extensions} from 'vscode';
 import * as path from 'path';
-import {ResultStore, MySQLResult} from '../utils/ResultStore';
+import {ResultCache, MySQLResult} from '../utils/ResultCache';
 
 export class MySqlResultDocumentContentProvider implements TextDocumentContentProvider{
     private static resultCssPath:string = path.join(extensions.getExtension('jblack.mysql-scratchpad').extensionPath, 'styles','result.css');
@@ -18,7 +18,7 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
     }
 
     public provideTextDocumentContent(uri:Uri):Thenable<string>|string{
-        let storedResult = ResultStore.get(uri.toString());
+        let storedResult = ResultCache.get(uri.toString());
 
         let output = this.head();
         if(storedResult){

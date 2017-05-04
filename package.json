@@ -17,7 +17,7 @@
     "contributes": {
         "commands": [
         {
-            "command": "mysql-scratchpad.executeCurrentLine",
+            "command": "mysql-scratchpad.executeCurrentStatement",
             "title": "Execute statement under cursor",
             "category": "MySQL"
         },{
@@ -30,7 +30,7 @@
             "category": "MySQL"
         },{
             "command": "mysql-scratchpad.openScratchpad",
-            "title": "Open Scratchpad",
+            "title": "Open New MySQL Scratchpad",
             "category": "MySQL"
         },{
             "command": "mysql-scratchpad.mysqlDisconnect",
