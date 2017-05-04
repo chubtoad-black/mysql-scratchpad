@@ -19,11 +19,10 @@ export class ResultCache{
     public static add(uri:string, result:MySQLResult):string{
         this.store.set(uri, result);
         this.nth++;
-        this.cacheWindow.push(uri);
         let toRemove = null;
-        if(this.cacheWindow.length > this.CACHE_SIZE){
-            toRemove = this.cacheWindow.shift();
-            this.remove(toRemove);
+        if(workspace.getConfiguration('mysql-scratchpad').get<boolean>('openResultsInNewTab')){
+            this.cacheWindow.push(uri);
+            toRemove = this.shiftCacheWindow();
         }
         return toRemove;
     }
@@ -40,6 +39,15 @@ export class ResultCache{
     public static clear(){
         this.store.clear();
         this.nth = 0;
+    }
+
+    private static shiftCacheWindow():string{
+        let toRemove = null;
+        if(this.CACHE_SIZE > 0 && this.cacheWindow.length > this.CACHE_SIZE){
+            toRemove = this.cacheWindow.shift();
+            this.remove(toRemove);
+        }
+        return toRemove;
     }
 
     private static remove(uri:string){

@@ -60,7 +60,7 @@
                 "mysql-scratchpad.resultCacheSize":{
                     "type":"integer",
                     "default":10,
-                    "description": "The number of results that are cached when openResultsInNewTab is set to true. The oldest result is removed when storing a new result."
+                    "description": "The number of results that are cached when 'openResultsInNewTab' is set to true. The oldest result is removed when storing a new result. A setting of 0 will remove the cache limit."
                 },
                 "mysql-scratchpad.defaultMysqlPort":{
                     "type":"integer",
