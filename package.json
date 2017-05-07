@@ -1,7 +1,8 @@
 {
     "name": "mysql-scratchpad",
-    "displayName": "mysql-scratchpad",
-    "description": "Easy mysql statement running and output.",
+    "displayName": "MySQL Statement Scratchpad and Execution.",
+    "description": "Easy mysql statement running with simple result display. Scratchpad for working with multiple statements.",
+    "icon": "icon.png",
     "version": "0.0.1",
     "publisher": "jblack",
     "engines": {

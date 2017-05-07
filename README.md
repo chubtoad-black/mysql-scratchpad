@@ -1,65 +1,62 @@
-# mysql-scratchpad README
+# mysql-scratchpad
 
-An extension for accessing a mysql database.
+An extension for accessing MySQL databases and quickly running statements. The scratchpad is a .sql file that you can use to type out a bunch of statements and run one or many of them quickly. I use this for working out complicated queries or for reading from databases.
+
+Thanks to [mysqljs/mysql](https://github.com/mysqljs/mysql) for the MySQL client.
+
 
 ## Features
+>Note: mysql-scratchpad is still in early development so I would not recommend using it in a production environment yet.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Connect to MySQL server
+Use the command palette to run the `MySQL: Connect` command. You will be prompted for host address, username and user password. Once a connection is made, an untitled .sql file will be opened. Connections are closed when using the `MySQL: Disconnect` command or when VSCode is closed.
 
-For example if there is an image subfolder under your extension project workspace:
+### Open sql scratchpad
+Use the command palette to run the `MySQL: Open New MySQL Scratchpad` command. This will open an untitled .sql file to use as a scratchpad. The scratchpad is just a regular .sql file, but you can execute sql from it on the current connection.
 
-\!\[feature X\]\(images/feature-x.png\)
+### Execute Statement At Cursor
+While on a .sql file you can execute the statement under the cursor on the current connection. You can use the default keyboard shortcut is `cmd+enter` (Windows: `ctrl+enter`) or run the `MySQL: Execute statement under cursor` command from the command palette. This allows you to quickly execute single statements from your scratchpad.
+The results will be opened in a new tab.
+> Note: The current statement detection is still immature so in order for it to work properly you must end all of your statements with a semiconlon.
+>```
+> CREATE TABLE mytable;
+>
+>SELECT * FROM mytable;
+>```
+>Without the semicolon at the end of the first statement, then both statements would be executed as one.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Execute Entire File
+While on a .sql file you can execute all of the statements in the file by running the `MySQL: Execute entire file`. The current connection will be used.
 
-## Requirements
+### Execute Selected Text As Statement
+While on any file you can execute selected text as a MySQL statement on the current connection. You can execute this command from the command palette `MySQL: Execute selected text as MySQL statement` or from the context menu on the selected text.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Disconnect from MySQL server
+You can disconnect from the mysql server by running `MySQL: Disconnect`.
+
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* `mysql-scratchpad.openResultsInNewTab`: Setting to open each statement result in a new tab. Results are cached, once the cache is full the oldest result is forgotten. Default: false
+
+* `mysql-scratchpad.resultCacheSize`: Sets the maximum result cache size. Only in effect when `mysql-scratchpad.openResultsInNewTab` is set to true. Setting this value to `0` will remove the cache limit. Default: 10
+
+* `mysql-scratchpad.defaultMysqlPort`: MySQL connection port. Default:3306
+
+* `mysql-scratchpad.promptForPort`: When set to true and connecting to a server a prompt will be shown asking for the connection port. If set to false the value from `mysql-scratchpad.defaultMysqlPort` will be used instead.
+
+* `mysql-scratchpad.promptForDatabase`: When set to true and connecting to a server a prompt will be shown asking for which database to use. If set to false no database is used.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+* Occasional issue where multiple statements are executed when trying to run `MySQL: Execute statement under cursor`. This is rare and I'm still working on tracking it down.
+* Results tab steals focus. Waiting for change to vscode api. 
+* Results for execution of entire file do not display.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release.
