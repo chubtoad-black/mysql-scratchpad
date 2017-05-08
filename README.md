@@ -4,9 +4,9 @@ An extension for accessing MySQL databases and quickly running statements. The s
 
 Thanks to [mysqljs/mysql](https://github.com/mysqljs/mysql) for the MySQL client.
 
+>Warning: mysql-scratchpad is still in early development so I would not recommend using it in a production environment yet.
 
 ## Features
->Note: mysql-scratchpad is still in early development so I would not recommend using it in a production environment yet.
 
 ### Connect to MySQL server
 Use the command palette to run the `MySQL: Connect` command. You will be prompted for host address, username and user password. Once a connection is made, an untitled .sql file will be opened. Connections are closed when using the `MySQL: Disconnect` command or when VSCode is closed.
