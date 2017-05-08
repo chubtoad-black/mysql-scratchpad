@@ -1,6 +1,6 @@
 # mysql-scratchpad
 
-An extension for accessing MySQL databases and quickly running statements. The scratchpad is a .sql file that you can use to type out a bunch of statements and run one or many of them quickly. I use this for working out complicated queries or for reading from databases.
+An extension for accessing MySQL databases and quickly running statements. The scratchpad is a .sql file that you can use to type out multiple statements and run one or many of them quickly. I use this for working out complicated queries or for reading from databases.
 
 Thanks to [mysqljs/mysql](https://github.com/mysqljs/mysql) for the MySQL client.
 
