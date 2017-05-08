@@ -3,8 +3,17 @@
     "displayName": "MySQL Statement Scratchpad and Execution.",
     "description": "Easy mysql statement running with simple result display. Scratchpad for working with multiple statements.",
     "icon": "icon.png",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "jblack",
+    "license": "SEE LICENSE IN LICENSE.md",
+    "bugs": {
+        "url": "https://github.com/chubtoad-black/mysql-scratchpad/issues"
+    },
+    "homepage": "https://github.com/chubtoad-black/mysql-scratchpad/blob/master/README.md",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/chubtoad-black/mysql-scratchpad.git"
+    },
     "engines": {
         "vscode": "^1.10.0"
     },
@@ -17,75 +26,85 @@
     "main": "./out/src/extension",
     "contributes": {
         "commands": [
-        {
-            "command": "mysql-scratchpad.executeCurrentStatement",
-            "title": "Execute statement under cursor",
-            "category": "MySQL"
-        },{
-            "command": "mysql-scratchpad.executeSelectedText",
-            "title": "Execute selected text as MySQL statement",
-            "category": "MySQL"    
-        },{
-            "command": "mysql-scratchpad.mysqlConnect",
-            "title": "Connect",
-            "category": "MySQL"
-        },{
-            "command": "mysql-scratchpad.openScratchpad",
-            "title": "Open New MySQL Scratchpad",
-            "category": "MySQL"
-        },{
-            "command": "mysql-scratchpad.mysqlDisconnect",
-            "title": "Disconnect",
-            "category": "MySQL"
-        },{
-            "command": "mysql-scratchpad.executeEntireFile",
-            "title": "Execute entire file",
-            "category": "MySQL"
-        }],
-        "menus":{
-            "editor/context": [{
+            {
+                "command": "mysql-scratchpad.executeCurrentStatement",
+                "title": "Execute statement under cursor",
+                "category": "MySQL"
+            },
+            {
                 "command": "mysql-scratchpad.executeSelectedText",
-                "when": "editorHasSelection",
-                "group": "10_mysql"
-            }]
+                "title": "Execute selected text as MySQL statement",
+                "category": "MySQL"
+            },
+            {
+                "command": "mysql-scratchpad.mysqlConnect",
+                "title": "Connect",
+                "category": "MySQL"
+            },
+            {
+                "command": "mysql-scratchpad.openScratchpad",
+                "title": "Open New MySQL Scratchpad",
+                "category": "MySQL"
+            },
+            {
+                "command": "mysql-scratchpad.mysqlDisconnect",
+                "title": "Disconnect",
+                "category": "MySQL"
+            },
+            {
+                "command": "mysql-scratchpad.executeEntireFile",
+                "title": "Execute entire file",
+                "category": "MySQL"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "mysql-scratchpad.executeSelectedText",
+                    "when": "editorHasSelection",
+                    "group": "10_mysql"
+                }
+            ]
         },
         "configuration": {
             "type": "object",
             "title": "MySQL Scratchpad Configuration",
             "properties": {
-                "mysql-scratchpad.openResultsInNewTab":{
+                "mysql-scratchpad.openResultsInNewTab": {
                     "type": "boolean",
                     "default": false,
                     "description": "Open mysql results in a new result tab."
                 },
-                "mysql-scratchpad.resultCacheSize":{
-                    "type":"integer",
-                    "default":10,
+                "mysql-scratchpad.resultCacheSize": {
+                    "type": "integer",
+                    "default": 10,
                     "description": "The number of results that are cached when 'openResultsInNewTab' is set to true. The oldest result is removed when storing a new result. A setting of 0 will remove the cache limit."
                 },
-                "mysql-scratchpad.defaultMysqlPort":{
-                    "type":"integer",
+                "mysql-scratchpad.defaultMysqlPort": {
+                    "type": "integer",
                     "default": 3306,
                     "description": "Default port when connecting to a MySQL server."
                 },
-                "mysql-scratchpad.promptForPort":{
-                    "type":"boolean",
-                    "default":false,
+                "mysql-scratchpad.promptForPort": {
+                    "type": "boolean",
+                    "default": false,
                     "description": "Prompt for port when making connection to a MySQL server."
                 },
-                "mysql-scratchpad.promptForDatabase":{
-                    "type":"boolean",
-                    "default":false,
+                "mysql-scratchpad.promptForDatabase": {
+                    "type": "boolean",
+                    "default": false,
                     "description": "Prompt for database to use when making a connection."
                 }
             }
         },
-        "keybindings": [{
-            "command": "mysql-scratchpad.executeCurrentStatement",
-            "key": "ctrl+enter",
-            "mac": "cmd+enter",
-            "when": "editorTextFocus && editorLangId == sql"
-        }]
+        "keybindings": [
+            {
+                "command": "mysql-scratchpad.executeCurrentStatement",
+                "key": "ctrl+enter",
+                "mac": "cmd+enter",
+                "when": "editorTextFocus && editorLangId == sql"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
