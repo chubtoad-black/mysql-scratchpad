@@ -45,7 +45,7 @@ export class RequestController{
 
         let statements = editor.document.getText();
         this.execute(statements)
-            .then(result => this.onEntireFileExecutionSuccess(result, statements.split(';')),
+            .then(result => this.onMultipleStatementExecutionSuccess(result, statements),
                     error => this.onExecutionError(error, statements, editor));
     }
 
@@ -61,7 +61,13 @@ export class RequestController{
         let statement = editor.document.getText(editor.selection);
 
         this.execute(statement)
-            .then(result => this.onSingleStatementExecutionSuccess(result, statement, editor), 
+            .then(result => {
+                if(this.isSingleStatement(statement)){
+                    this.onSingleStatementExecutionSuccess(result, statement, editor)
+                }else{
+                    this.onMultipleStatementExecutionSuccess(result, statement);
+                }
+            }, 
                 error => this.onExecutionError(error, statement, editor));
     }
 
@@ -137,8 +143,10 @@ export class RequestController{
         window.showTextDocument(editor.document, 1, false);
     }
 
-    private onEntireFileExecutionSuccess(result, statements:string[]){
+    private onMultipleStatementExecutionSuccess(result, combinedStatements:string){
+        let statements = combinedStatements.split(';');
         for(let statement of statements){
+            statement = statement.trim();
             if(statement && statement.length > 0){
                 OutputChannelController.outputSuccesss({
                     statement: statement,
@@ -149,27 +157,34 @@ export class RequestController{
     }
 
     private onExecutionError(error, statement, editor){
-        if(statement instanceof Array){
-            //Todo: think of something for the case of multiple statements
-            statement = null;
-        }else{
-            let uri = this.getResultUri();
-            ResultCache.add(uri.toString(), {
-                statement:statement,
-                result:null,
-                uri:uri.toString(),
-                timeTaken:this._timer,
-                error: error
-            });
+        let uri = this.getResultUri();
+        ResultCache.add(uri.toString(), {
+            statement:statement,
+            result:null,
+            uri:uri.toString(),
+            timeTaken:this._timer,
+            error: error
+        });
 
-            this.openResult(uri, editor);
+        this.openResult(uri, editor);
             
-        }
         OutputChannelController.outputError({
             message: error.message,
             statement: statement
         });
+    }
 
+    private isSingleStatement(text:string){
+        let count = 0;
+        for(let statement of text.split(';')){
+            if(statement && statement.trim().length > 0){
+                count++;
+                if(count >= 2){
+                    break;
+                }
+            }
+        }
+        return count === 1;
     }
 
     public dispose(){
