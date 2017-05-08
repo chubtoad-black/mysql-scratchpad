@@ -55,6 +55,11 @@ This extension contributes the following settings:
 * Results tab steals focus. Waiting for change to vscode api. 
 * Results for execution of entire file do not display.
 
+
+## TODO
+* Better statement parsing. I would like to show syntax errors before running the statement.
+* Better result display. The result table would be nice if you could adjust column widths and order columns.
+
 ## Release Notes
 
 ### 0.0.1
