@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import {Connection, ConnectionOptions, createConnection} from 'mysql';
 
-export class MySQLUtil{
+export class MySqlConnectionPrompt{
 
     public static getMysqlConnectionOptions():Promise<ConnectionOptions>{
         let options:ConnectionOptions = {};

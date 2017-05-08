@@ -3,7 +3,6 @@ import * as vscode from 'vscode';
 import {RequestController} from './controllers/RequestController';
 import {ConnectionController} from './controllers/ConnectionController';
 import {OutputChannelController} from './controllers/OutputChannelController';
-import {MySQLUtil} from './utils/MySQLUtil';
 import {ResultCache} from './utils/ResultCache';
 
 export function activate(context: vscode.ExtensionContext) {

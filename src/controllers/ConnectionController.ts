@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import {MySQLUtil} from '../utils/MySQLUtil';
+import {MySqlConnectionPrompt} from '../utils/MySqlConnectionPrompt';
 import {OutputChannelController} from './OutputChannelController';
 import {Connection, ConnectionOptions, createConnection, QueryError} from 'mysql';
 import {ResultCache} from '../utils/ResultCache';
@@ -27,7 +27,7 @@ export class ConnectionController{
         this._statusBarItem.text ='Connecting to MySQL server...';
         this._statusBarItem.show();
         OutputChannelController.showOutputChannel();
-        MySQLUtil.getMysqlConnectionOptions()
+        MySqlConnectionPrompt.getMysqlConnectionOptions()
             .then(options => this.connect(options))
             .then((connection:Connection) => this.onConnectionSuccess(), 
                 (error:QueryError) => this.onConnectionFailure(error));
