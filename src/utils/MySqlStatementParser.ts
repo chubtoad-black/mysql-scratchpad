@@ -121,7 +121,7 @@ export class MySqlStatementParser{
         return statement.trim();
     }
 
-    private stripCommentFromLine(line:string){
+    private stripCommentFromLine(line:string):string{
         let commentIdx = line.indexOf("--");
         if(commentIdx > -1){
             line = line.substring(0, commentIdx);

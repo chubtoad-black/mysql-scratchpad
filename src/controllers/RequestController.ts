@@ -15,17 +15,14 @@ export class RequestController{
         this._resultDocumentRegistration = workspace.registerTextDocumentContentProvider('mysql-scratchpad', this._resultDocumentProvider);
     }
 
-    public executeStatementUnderCursor(editor:TextEditor){
+    public executeStatementUnderCursor(editor:TextEditor):void{
         if(!editor || !editor.document){
             return;
         }
-
         let parsed = new MySqlStatementParser(editor).parseStatementAndRangeUnderCursor();
-
         if(!parsed || !parsed.statement){
             return;
         }
-
         this.updateDecorations(editor, parsed.range);
 
         this.execute(parsed.statement)
@@ -34,7 +31,7 @@ export class RequestController{
         
     }
 
-    public executeEntireFile(editor:TextEditor){
+    public executeEntireFile(editor:TextEditor):void{
         if(!editor || !editor.document){
             return;
         }
@@ -49,7 +46,7 @@ export class RequestController{
                     error => this.onExecutionError(error, statements, editor));
     }
 
-    public executeSelectedText(editor:TextEditor){
+    public executeSelectedText(editor:TextEditor):void{
         if(!editor || !editor.document){
             return;
         }
@@ -71,7 +68,7 @@ export class RequestController{
                 error => this.onExecutionError(error, statement, editor));
     }
 
-    private updateDecorations(editor:TextEditor, range:Range){
+    private updateDecorations(editor:TextEditor, range:Range):void{
         let options = {
                 light:{
                     backgroundColor:`rgba(0,255,0,0.4)`
@@ -103,7 +100,7 @@ export class RequestController{
         });
     }
 
-    private onSingleStatementExecutionSuccess(result, statement:string, editor:TextEditor){
+    private onSingleStatementExecutionSuccess(result, statement:string, editor:TextEditor):void{
         OutputChannelController.outputSuccesss({
             statement:statement,
             message:result.message
@@ -137,13 +134,13 @@ export class RequestController{
         return tabTitle;
     }
 
-    private openResult(uri:Uri, editor){
+    private openResult(uri:Uri, editor):void{
         this._resultDocumentProvider.refresh(uri);
         commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, this.getResultTabTitle());
         window.showTextDocument(editor.document, 1, false);
     }
 
-    private onMultipleStatementExecutionSuccess(result, combinedStatements:string){
+    private onMultipleStatementExecutionSuccess(result, combinedStatements:string):void{
         let statements = combinedStatements.split(';');
         for(let statement of statements){
             statement = statement.trim();
@@ -156,7 +153,7 @@ export class RequestController{
         }
     }
 
-    private onExecutionError(error, statement, editor){
+    private onExecutionError(error, statement, editor):void{
         let uri = this.getResultUri();
         ResultCache.add(uri.toString(), {
             statement:statement,
@@ -174,7 +171,7 @@ export class RequestController{
         });
     }
 
-    private isSingleStatement(text:string){
+    private isSingleStatement(text:string):boolean{
         let count = 0;
         for(let statement of text.split(';')){
             if(statement && statement.trim().length > 0){
@@ -187,7 +184,7 @@ export class RequestController{
         return count === 1;
     }
 
-    public dispose(){
+    public dispose():any{
         this._resultDocumentRegistration.dispose();
     }
 }

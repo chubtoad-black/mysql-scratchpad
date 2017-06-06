@@ -17,13 +17,13 @@ export class ConnectionController{
         this._statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right,99);
     }
 
-    public dispose(){
+    public dispose():void{
         this.disconnect()
             .then(() => OutputChannelController.outputDisconnect(), 
-                (err)=>this.handleConnectionError(err));
+                err => this.handleConnectionError(err));
     }
 
-    public inputConnectionAndConnect(){
+    public inputConnectionAndConnect():void{
         this._statusBarItem.text ='Connecting to MySQL server...';
         this._statusBarItem.show();
         OutputChannelController.showOutputChannel();
@@ -47,6 +47,11 @@ export class ConnectionController{
         })
     }
 
+    public openScratchpad():Thenable<any> | any{
+        return vscode.workspace.openTextDocument({language:'sql'})
+                    .then(doc => vscode.window.showTextDocument(doc));
+    }
+
     private onConnectionSuccess():Thenable<any>{
         this._statusBarItem.text = 'MySQL: '+this._connection.config.user+'@'+this._connection.config.host;
         OutputChannelController.outputConnection(this._connection);
@@ -64,11 +69,7 @@ export class ConnectionController{
             return null;
         }
         return this.disconnect()
-                    .then(() => {
-                            ResultCache.clear();
-                            this._statusBarItem.hide();
-                            vscode.window.showInformationMessage('MySQL connection closed.',{});
-                        }, 
+                    .then(() => this.onDisconnect(), 
                         error => this.handleConnectionError(error));
     }
     private disconnect():Promise<any>{
@@ -79,12 +80,14 @@ export class ConnectionController{
                 }else{
                     resolve();
                 }
-            })
-        })
+            });
+        });
     }
-    public openScratchpad():Thenable<any> | any{
-        return vscode.workspace.openTextDocument({language:'sql'})
-                    .then(doc => vscode.window.showTextDocument(doc));
+
+    private onDisconnect(){
+        ResultCache.clear();
+        this._statusBarItem.hide();
+        vscode.window.showInformationMessage('MySQL connection closed.',{});
     }
     
     private handleConnectionError(error:QueryError):Thenable<any>{
