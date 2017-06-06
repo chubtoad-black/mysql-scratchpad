@@ -11,6 +11,14 @@ td, th{
 .vscode-light td, .vscode-light th{
     border: 1px solid #000;
 }
-.cacheExpiredMessage{
+.cache-expired-message{
     font-size: 18px;
+}
+.result-divider{
+    min-height:40px;
+    border-bottom: 3px solid #fff;
+    margin-bottom:40px;
+}
+.vscode-light .result-divider{
+    border-color: #000;
 }

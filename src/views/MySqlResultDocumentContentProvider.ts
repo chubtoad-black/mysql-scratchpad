@@ -23,19 +23,54 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
 
         let output = this.head();
         if(storedResult){
-            output += this.header(storedResult);
-        
-            if(storedResult.error){
-                output += this.error(storedResult);
-            }else if(storedResult.result instanceof Array){
-                output += this.table(storedResult);
+            if(!storedResult.multiStatement){
+                output = this.buildResultHtml(output, storedResult);
             }else{
-                output += this.databaseUpdate(storedResult);
+                let statements = storedResult.statement.split(';');
+                let results = storedResult.result;
+
+                output += this.multiResultHeader(results.length);
+
+                let resultObj:MySQLResult = {
+                    statement: null,
+                    result: null,
+                    uri: storedResult.uri,
+                    timeTaken: storedResult.timeTaken,
+                    error: storedResult.error,
+                    multiStatement:true
+                };
+                for(let i=0; i<statements.length; i++){
+                    let statement = statements[i].trim();
+                    if(statement && statement.length > 0){
+                        if(i !== 0){
+                            output += this.resultDivider();
+                        }
+                        resultObj.statement = statements[i];
+                        resultObj.result = results[i];
+                        output = this.buildResultHtml(output, resultObj);
+                    }
+                }
             }
         }else{
-            output += "<p class='cacheExpiredMessage'>Result is no longer cached.</p><p>Change the 'resultCacheSize' setting to change the size of the result cache.</p>";
+            output += "<p class='cache-expired-message'>Result is no longer cached.</p><p>Change the 'resultCacheSize' setting to change the size of the result cache.</p>";
         }
         return output;
+    }
+
+    private multiResultHeader(resultCount:number){
+        return `<h1 class="mulit-result-header">${resultCount} Results</h1>`;
+    }
+
+    private buildResultHtml(html:string, storedResult:MySQLResult):string{
+        html += this.header(storedResult);
+        if(storedResult.error){
+            html += this.error(storedResult);
+        }else if(storedResult.result instanceof Array){
+            html += this.table(storedResult);
+        }else{
+            html += this.databaseUpdate(storedResult);
+        }
+        return html;
     }
 
     private head():string{
@@ -82,6 +117,10 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
             out+="</tr>"
         }
         return out;
+    }
+
+    private resultDivider():string{
+        return `<div class="result-divider"></div>`
     }
 
     private databaseUpdate(storedResult:MySQLResult):string{

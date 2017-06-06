@@ -6,7 +6,8 @@ export interface MySQLResult{
     result:any,
     uri:string,
     timeTaken:number,
-    error:QueryError
+    error:QueryError,
+    multiStatement?:boolean
 }
 
 export class ResultCache{
@@ -35,6 +36,9 @@ export class ResultCache{
         return this.store.get(uri);
     }
 
+    public static has(uri:string):boolean{
+        return this.store.has(uri);
+    }
 
     public static clear(){
         this.store.clear();

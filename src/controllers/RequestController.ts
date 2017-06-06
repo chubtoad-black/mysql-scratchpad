@@ -3,7 +3,7 @@ import {ConnectionController} from './ConnectionController';
 import {MySqlResultDocumentContentProvider} from '../views/MySqlResultDocumentContentProvider';
 import {MySqlStatementParser} from '../utils/MySqlStatementParser';
 import {OutputChannelController} from './OutputChannelController';
-import {ResultCache} from '../utils/ResultCache';
+import {ResultCache, MySQLResult} from '../utils/ResultCache';
 
 export class RequestController{
     private _resultDocumentProvider:MySqlResultDocumentContentProvider;
@@ -13,6 +13,10 @@ export class RequestController{
     constructor(){
         this._resultDocumentProvider = new MySqlResultDocumentContentProvider();
         this._resultDocumentRegistration = workspace.registerTextDocumentContentProvider('mysql-scratchpad', this._resultDocumentProvider);
+    }
+
+    public dispose():any{
+        this._resultDocumentRegistration.dispose();
     }
 
     public executeStatementUnderCursor(editor:TextEditor):void{
@@ -42,7 +46,7 @@ export class RequestController{
 
         let statements = editor.document.getText();
         this.execute(statements)
-            .then(result => this.onMultipleStatementExecutionSuccess(result, statements),
+            .then(result => this.onMultipleStatementExecutionSuccess(result, statements, editor),
                     error => this.onExecutionError(error, statements, editor));
     }
 
@@ -59,27 +63,13 @@ export class RequestController{
 
         this.execute(statement)
             .then(result => {
-                if(this.isSingleStatement(statement)){
-                    this.onSingleStatementExecutionSuccess(result, statement, editor)
-                }else{
-                    this.onMultipleStatementExecutionSuccess(result, statement);
-                }
-            }, 
+                    if(this.isSingleStatement(statement)){
+                        this.onSingleStatementExecutionSuccess(result, statement, editor)
+                    }else{
+                        this.onMultipleStatementExecutionSuccess(result, statement, editor);
+                    }
+                }, 
                 error => this.onExecutionError(error, statement, editor));
-    }
-
-    private updateDecorations(editor:TextEditor, range:Range):void{
-        let options = {
-                light:{
-                    backgroundColor:`rgba(0,255,0,0.4)`
-                },
-                dark: {
-                    backgroundColor:`rgba(255,255,255,0.4)`
-                }
-            };
-        let decoType = window.createTextEditorDecorationType(options);
-        editor.setDecorations(decoType,[range]);
-        setTimeout(() => editor.setDecorations(decoType,[]), 1000);
     }
 
     private execute(sql:string, args?:any[]):Thenable<any>{
@@ -106,51 +96,53 @@ export class RequestController{
             message:result.message
         });
         
+        this.cacheAndOpenResult(result, statement, editor, false);
+    }
+
+    private onMultipleStatementExecutionSuccess(result, combinedStatements:string, editor:TextEditor):void{
+        let statements = combinedStatements.split(';');
+        
+        for(let i=0; i<statements.length; i++){
+            let statement = statements[i];
+
+            if(statement && statement.length > 0){
+                statement = statement.trim();
+                let currentResult = result[i];
+
+                OutputChannelController.outputSuccesss({
+                    statement: statement,
+                    message: currentResult.message
+                });
+
+                if(this.isOpenResultsInNewTab()){
+                    this.cacheAndOpenResult(currentResult, statement, editor, false);
+                }
+            }
+        }
+        if(!this.isOpenResultsInNewTab()){
+            this.cacheAndOpenResult(result, combinedStatements, editor, true);
+        }
+    }
+
+    private cacheAndOpenResult(result, statement:string, editor:TextEditor, isMultiStatement?:boolean):void{
         let uri = this.getResultUri();
+
         ResultCache.add(uri.toString(), {
             statement:statement,
             result:result,
             uri:uri.toString(),
             timeTaken:this._timer,
-            error: null
+            error: null,
+            multiStatement: isMultiStatement
         });
 
         this.openResult(uri, editor);
     }
 
-    private getResultUri():Uri{
-        let uriString = 'mysql-scratchpad://authority/result'
-        if(workspace.getConfiguration('mysql-scratchpad').get('openResultsInNewTab')){
-            uriString += (new Date()).getTime();
-        }
-        return Uri.parse(uriString);
-    }
-
-    private getResultTabTitle():string{
-        let tabTitle = "MySQL Result";
-        if(workspace.getConfiguration('mysql-scratchpad').get('openResultsInNewTab')){
-            tabTitle += ` ${ResultCache.count()+1}`;
-        }
-        return tabTitle;
-    }
-
-    private openResult(uri:Uri, editor):void{
+    private openResult(uri:Uri, editor:TextEditor):void{
         this._resultDocumentProvider.refresh(uri);
         commands.executeCommand('vscode.previewHtml', uri, ViewColumn.Two, this.getResultTabTitle());
         window.showTextDocument(editor.document, 1, false);
-    }
-
-    private onMultipleStatementExecutionSuccess(result, combinedStatements:string):void{
-        let statements = combinedStatements.split(';');
-        for(let statement of statements){
-            statement = statement.trim();
-            if(statement && statement.length > 0){
-                OutputChannelController.outputSuccesss({
-                    statement: statement,
-                    message: null
-                });
-            }
-        }
     }
 
     private onExecutionError(error, statement, editor):void{
@@ -184,7 +176,45 @@ export class RequestController{
         return count === 1;
     }
 
-    public dispose():any{
-        this._resultDocumentRegistration.dispose();
+    private isOpenResultsInNewTab():boolean{
+        return workspace.getConfiguration('mysql-scratchpad').get<boolean>('openResultsInNewTab');
+    }
+
+    private getResultUri():Uri{
+        let uriPrefix = 'mysql-scratchpad://authority/result';
+        let uriString;
+        if(this.isOpenResultsInNewTab()){
+            let now = new Date().getTime();
+            uriString = uriPrefix + now;
+            while(ResultCache.has(uriString)){
+                now++;
+                uriString = uriPrefix + now;
+            }
+        }else{
+            uriString = uriPrefix;
+        }
+        return Uri.parse(uriString);
+    }
+
+    private getResultTabTitle():string{
+        let tabTitle = "MySQL Result";
+        if(this.isOpenResultsInNewTab()){
+            tabTitle += ` ${ResultCache.count()+1}`;
+        }
+        return tabTitle;
+    }
+
+    private updateDecorations(editor:TextEditor, range:Range):void{
+        let options = {
+                light:{
+                    backgroundColor:`rgba(0,255,0,0.4)`
+                },
+                dark: {
+                    backgroundColor:`rgba(255,255,255,0.4)`
+                }
+            };
+        let decoType = window.createTextEditorDecorationType(options);
+        editor.setDecorations(decoType,[range]);
+        setTimeout(() => editor.setDecorations(decoType,[]), 1000);
     }
 }
