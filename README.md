@@ -4,7 +4,6 @@ An extension for accessing MySQL databases and quickly running statements. The s
 
 Thanks to [mysqljs/mysql](https://github.com/mysqljs/mysql) for the MySQL client.
 
->Warning: mysql-scratchpad is still in early development so I would not recommend using it in a production environment yet.
 
 ## Features
 
@@ -53,7 +52,6 @@ This extension contributes the following settings:
 
 * Occasional issue where multiple statements are executed when trying to run `MySQL: Execute statement under cursor`. This is rare and I'm still working on tracking it down.
 * Results tab steals focus. Waiting for change to vscode api. 
-* Results for execution of entire file do not display.
 
 
 ## TODO
@@ -62,6 +60,13 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### 0.1.0
+* Added result display when executing multiple statements at once. If you have the open results in new tab setting on, then each result will get its own tab. Otherwise all results will be displayed one after another on the same tab.
+
+### 0.0.2
+
+* Minor bug fixes.
+
 ### 0.0.1
 
-Initial release.
+* Initial release.

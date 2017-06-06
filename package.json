@@ -2,7 +2,7 @@
     "name": "mysql-scratchpad",
     "displayName": "MySQL Statement Scratchpad and Execution.",
     "description": "Easy mysql statement running with simple result display. Scratchpad for working with multiple statements.",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "publisher": "jblack",
     "license": "SEE LICENSE IN LICENSE.md",
     "bugs": {
