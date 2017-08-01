@@ -107,6 +107,12 @@
                 "key": "ctrl+enter",
                 "mac": "cmd+enter",
                 "when": "editorTextFocus && editorLangId == sql"
+            },
+            {
+                "command": "mysql-scratchpad.executeSelectedText",
+                "key": "ctrl+enter",
+                "mac": "cmd+enter",
+                "when": "editorTextFocus && editorHasSelection && editorLangId == 'sql'"
             }
         ]
     },
