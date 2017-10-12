@@ -6,7 +6,15 @@ import {QueryError} from 'mysql';
 export class MySqlResultDocumentContentProvider implements TextDocumentContentProvider{
     private static resultCssPath:string = path.join(extensions.getExtension('jblack.mysql-scratchpad').extensionPath, 'styles','result.css');
     private _onDidChange = new EventEmitter<Uri>();
-    
+    private entityMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': '&quot;',
+        "'": '&#39;',
+        "/": '&#x2F;'
+    };
+
     constructor(){
     }
 
@@ -55,6 +63,14 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
             output += "<p class='cache-expired-message'>Result is no longer cached.</p><p>Change the 'resultCacheSize' setting to change the size of the result cache.</p>";
         }
         return output;
+    }
+
+    private escapeHtml(source: string) {
+        return String(source).replace(/[&<>"'\/]/g, s => this.entityMap[s]);
+    }
+
+    private nl2br(source: string) {
+        return String(source).replace(/\n/g, '<br>');
     }
 
     private multiResultHeader(resultCount:number){
@@ -112,7 +128,7 @@ export class MySqlResultDocumentContentProvider implements TextDocumentContentPr
         for(let row of storedResult.result){
             out+="<tr>";
             for(let col of columns){
-                out+=`<td>${row[col]}</td>`;
+                out+="<td>" + this.nl2br(this.escapeHtml(row[col])) + "</td>";
             }
             out+="</tr>"
         }
