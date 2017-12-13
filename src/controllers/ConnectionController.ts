@@ -23,12 +23,18 @@ export class ConnectionController{
                 err => this.handleConnectionError(err));
     }
 
-    public inputConnectionAndConnect():void{
+    public inputConnectionAndConnect(args: any[]):void{
         this._statusBarItem.text ='Connecting to MySQL server...';
         this._statusBarItem.show();
         OutputChannelController.showOutputChannel();
-        MySqlConnectionPrompt.getMysqlConnectionOptions()
-            .then(options => this.connect(options))
+        let connection_handle: Promise<Connection>;
+        if(Object.keys(args).length) {
+            connection_handle = this.connect(<ConnectionOptions> args);
+        } else {
+            connection_handle = MySqlConnectionPrompt.getMysqlConnectionOptions()
+                .then(options => this.connect(options));
+        }
+        connection_handle
             .then((connection:Connection) => this.onConnectionSuccess(), 
                 (error:QueryError) => this.onConnectionFailure(error));
     }
